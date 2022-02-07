@@ -1,0 +1,18 @@
+{
+  "error": false,
+  "category": "Dark",
+  "type": "twopart",
+  "setup": "What is the difference between a pizza and a black man?",
+  "delivery": "A pizza can feed a family of five.",
+  "flags": {
+    "nsfw": false,
+    "religious": false,
+    "political": false,
+    "racist": true,
+    "sexist": false,
+    "explicit": false
+  },
+  "id": 174,
+  "safe": false,
+  "lang": "en"
+}
