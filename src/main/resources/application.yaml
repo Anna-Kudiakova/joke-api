@@ -1,0 +1,3 @@
+securetracktraining:
+  jokeprovider:
+    url: https://v2.jokeapi.dev/joke
