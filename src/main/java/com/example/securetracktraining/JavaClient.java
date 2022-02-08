@@ -24,7 +24,7 @@ public class JavaClient {
         StandardWebSocketClient client = new StandardWebSocketClient();
         ListenableFuture<WebSocketSession> future = client.doHandshake(new MyTextWebSocketHandler(),
                 new WebSocketHttpHeaders(),
-                new URI("ws://localhost:8080/web-socket"));
+                new URI("ws://localhost:8080/jokes"));
         while (future.get().isOpen()) {
 
         }

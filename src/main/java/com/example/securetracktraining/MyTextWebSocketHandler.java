@@ -1,6 +1,7 @@
 package com.example.securetracktraining;
 
-import com.example.securetracktraining.exceptions.JokeClientException;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -22,6 +23,10 @@ public class MyTextWebSocketHandler extends TextWebSocketHandler {
 
     private final JokeProvider jokeProvider;
 
+    private final ObjectMapper objectMapper;
+
+    private final ConfigProperties configProperties;
+
     @Override
     public void afterConnectionEstablished(WebSocketSession session) {
 
@@ -29,19 +34,18 @@ public class MyTextWebSocketHandler extends TextWebSocketHandler {
         ScheduledExecutorService executorService = Executors.newScheduledThreadPool(5);
         ScheduledFuture<?> future = executorService.scheduleAtFixedRate(() -> {
             Joke joke = jokeProvider.getSimpleJoke();
-            String strJoke;
-            if ("single".equals(joke.getType()))
-                strJoke = joke.getJoke();
-            else if ("twopart".equals(joke.getType()))
-                strJoke = joke.getSetup() + "\n" + joke.getDelivery();
-            else
-                throw new JokeClientException("Unknown type of joke provided");
+            String jsonString = "";
             try {
-                session.sendMessage(new TextMessage(strJoke));
-            } catch (IOException e) {
-                e.printStackTrace();
+                jsonString = objectMapper.writeValueAsString(joke);
+            } catch (JsonProcessingException e) {
+                log.error(e.getMessage(), e);
             }
-        }, 0, 10, TimeUnit.SECONDS);
+            try {
+                session.sendMessage(new TextMessage(jsonString));
+            } catch (IOException e) {
+                log.error(e.getMessage(), e);
+            }
+        }, 0, configProperties.getPeriodicity(), TimeUnit.MILLISECONDS);
 
         session.getAttributes().put(getClass().getName(), future);
 
@@ -49,9 +53,9 @@ public class MyTextWebSocketHandler extends TextWebSocketHandler {
 
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
-        ScheduledFuture<?> scheduledFuture =
-                (ScheduledFuture<?>) session.getAttributes().get(getClass().getName());
-        scheduledFuture.cancel(true);
+        if (session.getAttributes().get(getClass().getName()) instanceof ScheduledFuture future) {
+            future.cancel(true);
+        }
         log.info("Connection is closed");
 
     }
