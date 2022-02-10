@@ -27,11 +27,12 @@ public class MyTextWebSocketHandler extends TextWebSocketHandler {
 
     private final ConfigProperties configProperties;
 
+    private final ScheduledExecutorService executorService = Executors.newScheduledThreadPool(5);
+
     @Override
     public void afterConnectionEstablished(WebSocketSession session) {
 
         log.info("Connection is established");
-        ScheduledExecutorService executorService = Executors.newScheduledThreadPool(5);
         ScheduledFuture<?> future = executorService.scheduleAtFixedRate(() -> {
             Joke joke = jokeProvider.getSimpleJoke();
             String jsonString = "";
