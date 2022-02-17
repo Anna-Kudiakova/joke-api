@@ -1,4 +1,18 @@
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/joke-app
+    username : postgres
+    password: postgres
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: none
+
 securetracktraining:
   jokeprovider:
     url: https://v2.jokeapi.dev/joke
     rate: 10000
+
