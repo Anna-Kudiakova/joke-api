@@ -1,14 +1,20 @@
 package com.example.securetracktraining;
 
+import org.dbunit.DatabaseUnitException;
 import org.dbunit.database.DatabaseDataSourceConnection;
 import org.dbunit.dataset.DataSetException;
 import org.dbunit.dataset.IDataSet;
 import org.dbunit.dataset.xml.FlatXmlDataSetBuilder;
 import org.dbunit.operation.DatabaseOperation;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.util.concurrent.ListenableFuture;
 import org.springframework.web.socket.WebSocketHttpHeaders;
 import org.springframework.web.socket.WebSocketSession;
@@ -26,6 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
+@ActiveProfiles("test")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class BasicAuthenticationIT {
 
@@ -36,7 +43,17 @@ public class BasicAuthenticationIT {
 
     @Autowired
     void setComponents(final DataSource dataSource) throws SQLException {
-        this.dataSourceConnection = new DatabaseDataSourceConnection(dataSource);
+        this.dataSourceConnection = new DatabaseDataSourceConnection(dataSource,"test");
+    }
+
+    @BeforeEach
+    void set_up() throws DatabaseUnitException, IOException, SQLException {
+        DatabaseOperation.REFRESH.execute(this.dataSourceConnection, readDataset());
+    }
+
+    @AfterEach
+    void close_connection() throws DatabaseUnitException, IOException, SQLException {
+        dataSourceConnection.close();
     }
 
     @Test
@@ -61,19 +78,14 @@ public class BasicAuthenticationIT {
         URI wsEndpoint = URI.create("ws://localhost:%d/jokes".formatted(serverPort));
 
         StandardWebSocketClient client = new StandardWebSocketClient();
-        try {
-            DatabaseOperation.REFRESH.execute(this.dataSourceConnection, readDataset());
-        String auth = "Biba" + ":" + "bibaPassword";
+
+        String auth = "user1" + ":" + "user1";
         WebSocketHttpHeaders headers = new WebSocketHttpHeaders();
         headers.add("Authorization", "Basic " + new String(Base64.getEncoder().encode(auth.getBytes())));
         ListenableFuture<WebSocketSession> future = client.doHandshake(new TextWebSocketHandler(),
                 headers, wsEndpoint);
 
         assertTrue(future.get().isOpen());
-
-        } finally {
-            this.dataSourceConnection.close();
-        }
     }
 
     private IDataSet readDataset() throws DataSetException, IOException {
