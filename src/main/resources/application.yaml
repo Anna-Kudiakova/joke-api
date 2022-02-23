@@ -1,3 +1,4 @@
 securetracktraining:
   jokeprovider:
     url: https://v2.jokeapi.dev/joke
+    rate: 10000
