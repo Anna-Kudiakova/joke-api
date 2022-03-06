@@ -13,7 +13,9 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 
 import java.io.IOException;
+import java.security.Principal;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
@@ -32,9 +34,16 @@ public class JokeWebSocketHandlerTest {
     ObjectMapper mapper;
 
     @Mock
+    CustomJokeService customJokeService;
+
+    @Mock
     JokeProvider jokeProvider;
     @Mock
     WebSocketSession session;
+
+    @Mock
+    Principal principal;
+
     @Mock
     ConfigProperties configProperties;
 
@@ -44,10 +53,15 @@ public class JokeWebSocketHandlerTest {
     @Test
     public void afterConnectionEstablished_ok() throws IOException, InterruptedException, TimeoutException {
 
-        when(jokeProvider.getSimpleJoke()).thenReturn(getJoke());
+        List<String> categories = List.of("Programming","Pun");
+        List<String> flags = List.of("sexist","explicit");
+
         when(configProperties.getRate()).thenReturn(100L);
-
-
+        when(session.getPrincipal()).thenReturn(principal);
+        when(principal.getName()).thenReturn("Macron");
+        when(customJokeService.getCategories("Macron")).thenReturn(categories);
+        when(customJokeService.getFlags("Macron")).thenReturn(flags);
+        when(jokeProvider.getJoke(categories,flags)).thenReturn(getJoke());
         Map<String, Object> attributes = new HashMap<>();
 
         when(session.getAttributes()).thenReturn(attributes);
@@ -80,8 +94,15 @@ public class JokeWebSocketHandlerTest {
     public void afterConnectionEstablished_IOException()
             throws IOException, InterruptedException, TimeoutException {
 
-        when(jokeProvider.getSimpleJoke()).thenReturn(getJoke());
+        List<String> categories = List.of("Programming","Pun");
+        List<String> flags = List.of("sexist","explicit");
+
         when(configProperties.getRate()).thenReturn(100L);
+        when(session.getPrincipal()).thenReturn(principal);
+        when(principal.getName()).thenReturn("Macron");
+        when(customJokeService.getCategories("Macron")).thenReturn(categories);
+        when(customJokeService.getFlags("Macron")).thenReturn(flags);
+        when(jokeProvider.getJoke(categories,flags)).thenReturn(getJoke());
 
         String joke = mapper.writeValueAsString(getJoke());
 
@@ -93,7 +114,6 @@ public class JokeWebSocketHandlerTest {
                     w.resume();
                 }))).when(session).sendMessage(any(TextMessage.class));
 
-        JokeWebSocketHandler handler = new JokeWebSocketHandler(jokeProvider, mapper, configProperties);
         handler.afterConnectionEstablished(session);
 
         w.await(200, TimeUnit.MILLISECONDS, 1);
