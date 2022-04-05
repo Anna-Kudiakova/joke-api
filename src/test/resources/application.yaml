@@ -6,8 +6,6 @@ securetracktraining:
 
 spring:
   datasource:
-    hikari:
-      schema: test
     jdbc-url: jdbc:postgresql://localhost:5432/joke-app?currentSchema=test
     username : ${APPLICATION_DB_USERNAME}
     password: ${APPLICATION_DB_PASSWORD}

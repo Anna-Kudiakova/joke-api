@@ -24,6 +24,9 @@ import java.sql.SQLException;
 import java.util.Base64;
 import java.util.concurrent.ForkJoinPool;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class PreferenceControllerIT {
 
@@ -52,27 +55,34 @@ public class PreferenceControllerIT {
 
     @Test
     void testSetPreferences_ok() throws Exception {
+        DatabaseOperation.REFRESH.execute(this.dataSourceConnection, getActualDataset());
         HttpClient httpClient = HttpClient.newBuilder().executor(ForkJoinPool.commonPool()).build();
-        String auth = "Biba" + ":" + "bibaPassword";
+        String auth = "user1" + ":" + "user1";
         var uri = new URIBuilder().setScheme("http").setHost("localhost").setPort(serverPort)
                 .setPath("/preferences")
                 .setParameter("id", "1")
-                .setParameter("categories", "pun")
+                .setParameter("categories", "dark")
                 .setParameter("flags", "political")
                 .build();
-        httpClient.send(HttpRequest.newBuilder()
+        HttpResponse<String> response = httpClient.send(HttpRequest.newBuilder()
                 .uri(uri)
                 .header("Authorization", "Basic " + new String(Base64.getEncoder().encode(auth.getBytes())))
                 .PUT(HttpRequest.BodyPublishers.noBody())
                 .build(), HttpResponse.BodyHandlers.ofString());
+
+        assertEquals(response.statusCode(), 200);
+
+        IDataSet actualDataset = dataSourceConnection.createDataSet();
+        boolean actualCategoryValue = (boolean) actualDataset.getTable("categories").getValue(0, "dark");
+        boolean actualFlagValue = (boolean) actualDataset.getTable("flags").getValue(0, "political");
+
+        assertTrue(actualCategoryValue);
+        assertTrue(actualFlagValue);
+        dataSourceConnection.close();
+
     }
 
     private IDataSet getActualDataset() throws DataSetException, IOException {
-        return new FlatXmlDataSetBuilder().build(getClass().getClassLoader()
-                .getResourceAsStream("PreferenceControllerIT_dataset.xml"));
-    }
-
-    private IDataSet getExpectedDataset() throws DataSetException, IOException {
         return new FlatXmlDataSetBuilder().build(getClass().getClassLoader()
                 .getResourceAsStream("PreferenceControllerIT_dataset.xml"));
     }
