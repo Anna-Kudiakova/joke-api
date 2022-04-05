@@ -1,7 +1,7 @@
 package com.example.securetracktraining;
 
 
-import com.example.securetracktraining.config.CustomWebSecurityConfigurerAdapter;
+import org.apache.hc.core5.net.URIBuilder;
 import org.dbunit.DatabaseUnitException;
 import org.dbunit.database.DatabaseDataSourceConnection;
 import org.dbunit.dataset.DataSetException;
@@ -12,34 +12,32 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import javax.sql.DataSource;
 import java.io.IOException;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.sql.SQLException;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
+import java.util.Base64;
+import java.util.concurrent.ForkJoinPool;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class PreferenceControllerIT {
 
 
+    @LocalServerPort
+    private int serverPort;
+
     private DatabaseDataSourceConnection dataSourceConnection;
 
     @Autowired
-    void setComponents(final MockMvc mockMvc, final DataSource dataSource) throws SQLException {
-        this.dataSourceConnection = new DatabaseDataSourceConnection(dataSource,"test");
+    void setComponents(final DataSource dataSource) throws SQLException {
+        this.dataSourceConnection = new DatabaseDataSourceConnection(dataSource, "test");
     }
+
 
     @BeforeEach
     void set_up() throws DatabaseUnitException, IOException, SQLException {
@@ -51,9 +49,22 @@ public class PreferenceControllerIT {
         dataSourceConnection.close();
     }
 
+
     @Test
     void testSetPreferences_ok() throws Exception {
-
+        HttpClient httpClient = HttpClient.newBuilder().executor(ForkJoinPool.commonPool()).build();
+        String auth = "Biba" + ":" + "bibaPassword";
+        var uri = new URIBuilder().setScheme("http").setHost("localhost").setPort(serverPort)
+                .setPath("/preferences")
+                .setParameter("id", "1")
+                .setParameter("categories", "pun")
+                .setParameter("flags", "political")
+                .build();
+        httpClient.send(HttpRequest.newBuilder()
+                .uri(uri)
+                .header("Authorization", "Basic " + new String(Base64.getEncoder().encode(auth.getBytes())))
+                .PUT(HttpRequest.BodyPublishers.noBody())
+                .build(), HttpResponse.BodyHandlers.ofString());
     }
 
     private IDataSet getActualDataset() throws DataSetException, IOException {

@@ -122,11 +122,6 @@
 			<version>8.5.1</version>
 		</dependency>
 		<dependency>
-			<groupId>io.springfox</groupId>
-			<artifactId>springfox-boot-starter</artifactId>
-			<version>3.0.0</version>
-		</dependency>
-		<dependency>
 			<groupId>io.ebean</groupId>
 			<artifactId>ebean</artifactId>
 			<version>12.15.0</version>
