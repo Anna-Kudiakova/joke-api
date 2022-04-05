@@ -1,4 +1,4 @@
-package com.example.securetracktraining;
+package com.example.securetracktraining.services;
 
 
 import com.example.securetracktraining.dao.impl.UserRepositoryImpl;
