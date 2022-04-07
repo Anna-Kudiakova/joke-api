@@ -18,10 +18,8 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Override
     public Optional<User> findByUsername(String username) {
-        return Optional.ofNullable(database
-                .find(User.class)
+        return database.find(User.class)
                 .where().eq("username", username)
-                .findOne()
-        );
+                .findOneOrEmpty();
     }
 }

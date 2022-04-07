@@ -1,8 +1,8 @@
 package com.example.securetracktraining.services;
 
 
-import com.example.securetracktraining.dao.impl.CategoriesRepositoryImpl;
-import com.example.securetracktraining.dao.impl.FlagsRepositoryImpl;
+import com.example.securetracktraining.dao.CategoriesRepository;
+import com.example.securetracktraining.dao.FlagsRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -13,9 +13,9 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class PreferenceService {
 
-    private final CategoriesRepositoryImpl categoriesRepository;
+    private final CategoriesRepository categoriesRepository;
 
-    private final FlagsRepositoryImpl flagsRepository;
+    private final FlagsRepository flagsRepository;
 
     public void setPreferences(Long id, List<String> categories, List<String> flags) {
         if (Objects.nonNull(categories)) {

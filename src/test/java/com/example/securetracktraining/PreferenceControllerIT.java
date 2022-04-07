@@ -43,19 +43,18 @@ public class PreferenceControllerIT {
 
 
     @BeforeEach
-    void set_up() throws DatabaseUnitException, IOException, SQLException {
+    void setUp() throws DatabaseUnitException, SQLException {
         DatabaseOperation.REFRESH.execute(this.dataSourceConnection, getActualDataset());
     }
 
     @AfterEach
-    void close_connection() throws DatabaseUnitException, IOException, SQLException {
+    void closeConnection() throws SQLException {
         dataSourceConnection.close();
     }
 
 
     @Test
     void testSetPreferences_ok() throws Exception {
-        DatabaseOperation.REFRESH.execute(this.dataSourceConnection, getActualDataset());
         HttpClient httpClient = HttpClient.newBuilder().executor(ForkJoinPool.commonPool()).build();
         String auth = "user1" + ":" + "user1";
         var uri = new URIBuilder().setScheme("http").setHost("localhost").setPort(serverPort)
@@ -78,11 +77,9 @@ public class PreferenceControllerIT {
 
         assertTrue(actualCategoryValue);
         assertTrue(actualFlagValue);
-        dataSourceConnection.close();
-
     }
 
-    private IDataSet getActualDataset() throws DataSetException, IOException {
+    private IDataSet getActualDataset() throws DataSetException {
         return new FlatXmlDataSetBuilder().build(getClass().getClassLoader()
                 .getResourceAsStream("PreferenceControllerIT_dataset.xml"));
     }

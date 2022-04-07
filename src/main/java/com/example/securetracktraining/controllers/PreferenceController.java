@@ -13,10 +13,6 @@ import java.util.List;
 @RequestMapping("/preferences")
 public class PreferenceController {
 
-    private final CategoriesRepositoryImpl categoriesRepository;
-
-    private final FlagsRepositoryImpl flagsRepository;
-
     private final PreferenceService preferenceService;
 
     @PutMapping

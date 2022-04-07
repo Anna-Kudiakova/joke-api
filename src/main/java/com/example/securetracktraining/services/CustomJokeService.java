@@ -1,7 +1,7 @@
 package com.example.securetracktraining.services;
 
 
-import com.example.securetracktraining.dao.impl.UserRepositoryImpl;
+import com.example.securetracktraining.dao.UserRepository;
 import com.example.securetracktraining.dao.model.Categories;
 import com.example.securetracktraining.dao.model.Flags;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +15,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CustomJokeService {
 
-    private final UserRepositoryImpl userRepository;
+    private final UserRepository userRepository;
 
 
     public List<String> getCategories(String username) {
