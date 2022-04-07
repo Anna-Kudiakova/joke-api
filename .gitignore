@@ -1,6 +1,6 @@
 HELP.md
 Scheduler.java
-application.properties
+grpc-client/application.properties
 target/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/

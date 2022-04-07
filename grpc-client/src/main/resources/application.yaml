@@ -1,0 +1,14 @@
+spring:
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    jdbc-url: jdbc:postgresql://localhost:5432/joke-app
+    username : ${APPLICATION_DB_USERNAME}
+    password: ${APPLICATION_DB_PASSWORD}
+
+
+securetracktraining:
+  jokeprovider:
+    grpc-port: 6565

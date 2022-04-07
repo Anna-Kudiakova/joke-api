@@ -1,0 +1,8 @@
+securetracktraining:
+  jokeprovider:
+    url: https://v2.jokeapi.dev/joke
+    rate: 5000
+    grpc-port: 6565
+
+server:
+  port: 8082
