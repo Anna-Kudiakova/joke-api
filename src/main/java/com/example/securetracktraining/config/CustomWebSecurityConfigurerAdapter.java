@@ -38,8 +38,12 @@ public class CustomWebSecurityConfigurerAdapter extends WebSecurityConfigurerAda
         http.authorizeRequests()
                 .anyRequest().authenticated()
                 .and()
+                .csrf()
+                .ignoringAntMatchers("/preferences/**")
+                .and()
                 .httpBasic()
-                .authenticationEntryPoint(authenticationEntryPoint);
+                .authenticationEntryPoint(authenticationEntryPoint)
+        ;
 
     }
 

@@ -5,12 +5,8 @@ securetracktraining:
 
 
 spring:
-  flyway:
-    baselineOnMigrate: true
   datasource:
-    hikari:
-      schema: test
-    url: jdbc:postgresql://localhost:5432/joke-app
+    jdbc-url: jdbc:postgresql://localhost:5432/joke-app?currentSchema=test
     username : ${APPLICATION_DB_USERNAME}
     password: ${APPLICATION_DB_PASSWORD}
 

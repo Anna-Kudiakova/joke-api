@@ -1,0 +1,5 @@
+<dataset>
+    <users id="1" username="user1" password ="$2a$10$RrhnKgtegqA7hT0UX.cw7..aycCpe4v/NcUIt.qUjFi751t6S8QKO" authority="ROLE_USER"/>
+    <categories id="1" programming="false" misc="false" dark="false" pun="false" spooky="false" christmas="false"/>
+    <flags id="1" nsfw="false" religious="false" political="false" racist="false" sexist="false" explicit="false"/>
+</dataset>
