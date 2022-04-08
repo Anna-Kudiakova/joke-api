@@ -1,0 +1,12 @@
+securetracktraining:
+  jokeprovider:
+    url: http://localhost:9561
+
+
+
+spring:
+  datasource:
+    jdbc-url: jdbc:postgresql://localhost:5432/joke-app?currentSchema=test
+    username : ${APPLICATION_DB_USERNAME}
+    password: ${APPLICATION_DB_PASSWORD}
+

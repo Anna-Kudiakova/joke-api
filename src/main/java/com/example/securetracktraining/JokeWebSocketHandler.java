@@ -1,6 +1,6 @@
 package com.example.securetracktraining;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import com.example.securetracktraining.services.CustomJokeService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,6 +23,8 @@ public class JokeWebSocketHandler extends TextWebSocketHandler {
 
     private final JokeProvider jokeProvider;
 
+    private final CustomJokeService customJokeService;
+
     private final ObjectMapper objectMapper;
 
     private final ConfigProperties configProperties;
@@ -34,7 +36,10 @@ public class JokeWebSocketHandler extends TextWebSocketHandler {
 
         log.info("Connection is established");
         ScheduledFuture<?> future = executorService.scheduleAtFixedRate(() -> {
-            Joke joke = jokeProvider.getSimpleJoke();
+            String username = session.getPrincipal().getName();
+            Joke joke = jokeProvider.getJoke(
+                    customJokeService.getCategories(username),
+                    customJokeService.getFlags(username));
             String jsonString = "";
             try {
                 jsonString = objectMapper.writeValueAsString(joke);

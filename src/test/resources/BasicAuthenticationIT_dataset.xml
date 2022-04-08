@@ -1,0 +1,4 @@
+<dataset>
+    <users id="1" username="user1" password ="$2a$10$RrhnKgtegqA7hT0UX.cw7..aycCpe4v/NcUIt.qUjFi751t6S8QKO" authority="ROLE_USER"/>
+    <users id="2" username="user2" password ="$2a$10$Am90fR7SpbN4Q2e/YKNU1.G5TFEdd9rLO3Np548H/YF9yldSm2jgO" authority="ROLE_USER"/>
+</dataset>

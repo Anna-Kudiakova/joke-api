@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Objects;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -78,8 +79,8 @@ public class JokeProviderIT {
                 .willReturn(WireMock.aResponse()
                         .withStatus(HttpStatus.OK.value())
                         .withHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
-                        .withBody(new String(Files.readAllBytes(Paths.get(
-                                "src\\test\\resources\\get-joke-response.json"))))));
+                        .withBody(getClass().getClassLoader().getResourceAsStream(
+                                "get-joke-response.json").readAllBytes())));
 
         assertEquals(jokeProvider.getJoke(categories, blacklistFlags), new Joke(
                 "Spooky", "twopart", null,
@@ -97,8 +98,8 @@ public class JokeProviderIT {
                 .willReturn(WireMock.aResponse()
                         .withStatus(HttpStatus.OK.value())
                         .withHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
-                        .withBody(new String(Files.readAllBytes(Paths.get(
-                                "src/test/resources/get-joke-response.json"))))));
+                        .withBody(getClass().getClassLoader().getResourceAsStream(
+                                "get-joke-response.json").readAllBytes())));
 
         assertEquals(jokeProvider.getJoke(categories, null), new Joke(
                 "Spooky", "twopart", null,
