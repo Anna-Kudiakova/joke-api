@@ -21,6 +21,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.sql.SQLException;
 import java.util.Base64;
+import java.util.List;
 import java.util.concurrent.ForkJoinPool;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -53,13 +54,36 @@ public class PreferenceControllerIT {
 
 
     @Test
-    void testSetPreferences_ok() throws Exception {
+    void testSetCategories_ok() throws Exception {
         HttpClient httpClient = HttpClient.newBuilder().executor(ForkJoinPool.commonPool()).build();
         String auth = "user1" + ":" + "user1";
         var uri = new URIBuilder().setScheme("http").setHost("localhost").setPort(serverPort)
-                .setPath("/preferences")
+                .setPath("/preferences/categories")
                 .setParameter("id", "1")
                 .setParameter("categories", "dark")
+                .build();
+        HttpResponse<String> response = httpClient.send(HttpRequest.newBuilder()
+                .uri(uri)
+                .header("Authorization", "Basic " + new String(Base64.getEncoder().encode(auth.getBytes())))
+                .PUT(HttpRequest.BodyPublishers.noBody())
+                .build(), HttpResponse.BodyHandlers.ofString());
+
+        assertEquals(response.statusCode(), 200);
+        assertEquals("[\"Dark\"]", response.body());
+
+        IDataSet actualDataset = dataSourceConnection.createDataSet();
+        boolean actualCategoryValue = (boolean) actualDataset.getTable("categories").getValue(0, "dark");
+
+        assertTrue(actualCategoryValue);
+    }
+
+    @Test
+    void testSetFlags_ok() throws Exception {
+        HttpClient httpClient = HttpClient.newBuilder().executor(ForkJoinPool.commonPool()).build();
+        String auth = "user1" + ":" + "user1";
+        var uri = new URIBuilder().setScheme("http").setHost("localhost").setPort(serverPort)
+                .setPath("/preferences/flags")
+                .setParameter("id", "1")
                 .setParameter("flags", "political")
                 .build();
         HttpResponse<String> response = httpClient.send(HttpRequest.newBuilder()
@@ -71,10 +95,8 @@ public class PreferenceControllerIT {
         assertEquals(response.statusCode(), 200);
 
         IDataSet actualDataset = dataSourceConnection.createDataSet();
-        boolean actualCategoryValue = (boolean) actualDataset.getTable("categories").getValue(0, "dark");
         boolean actualFlagValue = (boolean) actualDataset.getTable("flags").getValue(0, "political");
 
-        assertTrue(actualCategoryValue);
         assertTrue(actualFlagValue);
     }
 

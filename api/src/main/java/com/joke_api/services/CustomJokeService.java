@@ -5,6 +5,8 @@ import com.joke_api.dao.UserRepository;
 import com.joke_api.dao.model.Categories;
 import com.joke_api.dao.model.Flags;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -13,13 +15,13 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class CustomJokeService {
 
     private final UserRepository userRepository;
 
-
+    @Cacheable(value = "categories", key = "#username")
     public List<String> getCategories(String username) {
-
         List<String> categories = new ArrayList<>();
 
         userRepository.findByUsername(username).ifPresent(user -> {
@@ -47,6 +49,7 @@ public class CustomJokeService {
         return categories;
     }
 
+    @Cacheable(value = "flags", key = "#username")
     public List<String> getFlags(String username) {
 
         List<String> flags = new ArrayList<>();

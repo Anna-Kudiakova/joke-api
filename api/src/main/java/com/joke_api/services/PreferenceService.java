@@ -4,8 +4,10 @@ package com.joke_api.services;
 import com.joke_api.dao.CategoriesRepository;
 import com.joke_api.dao.FlagsRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -17,29 +19,97 @@ public class PreferenceService {
 
     private final FlagsRepository flagsRepository;
 
-    public void setPreferences(Long id, List<String> categories, List<String> flags) {
+    @CachePut(value = "categories", key = "#username")
+    public List<String> setCategories(Long id, List<String> categories, String username) {
+        List<String> categoriesList = new ArrayList<>();
         if (Objects.nonNull(categories)) {
             categoriesRepository.findById(id).ifPresent(categoriesEntity -> {
-                categoriesEntity.setProgramming(categories.contains("programming"));
-                categoriesEntity.setMisc(categories.contains("misc"));
-                categoriesEntity.setDark(categories.contains("dark"));
-                categoriesEntity.setPun(categories.contains("pun"));
-                categoriesEntity.setSpooky(categories.contains("spooky"));
-                categoriesEntity.setChristmas(categories.contains("christmas"));
+                if(categories.contains("programming")) {
+                    categoriesEntity.setProgramming(true);
+                    categoriesList.add("Programming");
+                } else {
+                    categoriesEntity.setProgramming(false);
+                }
+                if(categories.contains("misc")) {
+                    categoriesEntity.setMisc(true);
+                    categoriesList.add("Misc");
+                } else {
+                    categoriesEntity.setMisc(false);
+                }
+                if(categories.contains("dark")) {
+                    categoriesEntity.setDark(true);
+                    categoriesList.add("Dark");
+                } else {
+                    categoriesEntity.setDark(false);
+                }
+                if(categories.contains("pun")) {
+                    categoriesEntity.setPun(true);
+                    categoriesList.add("Pun");
+                } else {
+                    categoriesEntity.setPun(false);
+                }
+                if(categories.contains("spooky")) {
+                    categoriesEntity.setSpooky(true);
+                    categoriesList.add("Spooky");
+                } else {
+                    categoriesEntity.setSpooky(false);
+                }
+                if(categories.contains("christmas")) {
+                    categoriesEntity.setChristmas(true);
+                    categoriesList.add("Christmas");
+                } else {
+                    categoriesEntity.setChristmas(false);
+                }
                 categoriesRepository.update(categoriesEntity);
             });
         }
+        return categoriesList;
+    }
+
+    @CachePut(value = "flags", key = "#username")
+    public List<String> setFlags(Long id, List<String> flags, String username) {
+        List<String> flagsList = new ArrayList<>();
         if (Objects.nonNull(flags)) {
             flagsRepository.findById(id).ifPresent(flagsEntity -> {
-
-                flagsEntity.setNsfw(flags.contains("nsfw"));
-                flagsEntity.setReligious(flags.contains("religious"));
-                flagsEntity.setPolitical(flags.contains("political"));
-                flagsEntity.setRacist(flags.contains("racist"));
-                flagsEntity.setSexist(flags.contains("sexist"));
-                flagsEntity.setExplicit(flags.contains("explicit"));
+                if(flags.contains("nsfw")) {
+                    flagsEntity.setNsfw(true);
+                    flagsList.add("nsfw");
+                } else {
+                    flagsEntity.setNsfw(false);
+                }
+                if(flags.contains("religious")) {
+                    flagsEntity.setReligious(true);
+                    flagsList.add("religious");
+                } else {
+                    flagsEntity.setReligious(false);
+                }
+                if(flags.contains("political")) {
+                    flagsEntity.setPolitical(true);
+                    flagsList.add("political");
+                } else {
+                    flagsEntity.setPolitical(false);
+                }
+                if(flags.contains("racist")) {
+                    flagsEntity.setRacist(true);
+                    flagsList.add("racist");
+                } else {
+                    flagsEntity.setRacist(false);
+                }
+                if(flags.contains("sexist")) {
+                    flagsEntity.setSexist(true);
+                    flagsList.add("sexist");
+                } else {
+                    flagsEntity.setSexist(false);
+                }
+                if(flags.contains("explicit")) {
+                    flagsEntity.setExplicit(true);
+                    flagsList.add("explicit");
+                } else {
+                    flagsEntity.setExplicit(false);
+                }
                 flagsRepository.update(flagsEntity);
             });
         }
+        return flagsList;
     }
 }

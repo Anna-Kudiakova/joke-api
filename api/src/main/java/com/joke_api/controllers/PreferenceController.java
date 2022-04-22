@@ -2,11 +2,13 @@ package com.joke_api.controllers;
 
 import com.joke_api.services.PreferenceService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.security.Principal;
 import java.util.List;
 
 @RestController
@@ -16,12 +18,16 @@ public class PreferenceController {
 
     private final PreferenceService preferenceService;
 
-    @PutMapping
-    public void setPreferences(@RequestParam Long id,
-                               @RequestParam(required = false) List<String> categories,
-                               @RequestParam(required = false) List<String> flags) {
+    @PutMapping(path = "/categories")
+    public List<String> setCategories(@RequestParam Long id, @RequestParam List<String> categories, Principal principal) {
 
-        preferenceService.setPreferences(id, categories, flags);
+        return preferenceService.setCategories(id, categories, principal.getName());
+    }
+
+    @PutMapping(path = "/flags")
+    public List<String> setFlags(@RequestParam Long id, @RequestParam List<String> flags, Principal principal) {
+
+        return preferenceService.setFlags(id, flags, principal.getName());
     }
 
 }
